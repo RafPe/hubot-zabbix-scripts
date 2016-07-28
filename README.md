@@ -1,6 +1,8 @@
 # Hubot Zabbix maintanance script
 This scripts provide functionality to use zabbix maintanance directly from your Slack/Rocket chat
 
+![s](https://github.com/RafPe/hubot-zabbix-scripts/blob/master/screenshots/hubot_zbx_maint_v1.png?raw=true)
+
 ## Info:
 This is running already in production solution. It has been tested however I believe it can always be made better.For sure certain things can be done better - if you find thos - let me know
 
@@ -69,5 +71,5 @@ usage: zbx-maint.py [-h] -u USER -p PASSWORD [-t TARGET] [-s SERVER] -a ACTION
 ```
 
 ## Thanks for help and code goes to:
-* sanderv32
-*
+* [sanderv32](https://github.com/sanderv32) for mentoring and patience :)
+* Alexander Bulimov <lazywolf0@gmail.com> for original work on Ansible python module
