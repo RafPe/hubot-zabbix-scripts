@@ -73,3 +73,6 @@ usage: zbx-maint.py [-h] -u USER -p PASSWORD [-t TARGET] [-s SERVER] -a ACTION
 ## Thanks for help and code goes to:
 * [sanderv32](https://github.com/sanderv32) for mentoring and patience :)
 * Alexander Bulimov <lazywolf0@gmail.com> for original work on Ansible python module
+
+## Future development
+Planned to include listing of maintanance being active / scheduling
