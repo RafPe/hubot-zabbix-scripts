@@ -92,61 +92,67 @@ def delete_maintenance(zbx, maintenance_id):
     return "Done!"
 
 
-def get_group_ids(zbx, host_groups):
-    group_ids = []
-    for group in host_groups.strip().split(","):
-        try:
-            result = zbx.hostgroup.get(
+def get_group_id(zbx, host_group):
+    try:
+
+        if '\"' in host_group:
+            host_group = host_group.replace("\"","")
+
+        result = zbx.hostgroup.get(
+            {
+                "output": "extend",
+                "filter":
                 {
-                    "output": "extend",
-                    "filter":
-                    {
-                        "name": group
-                    }
+                    "name": host_group
                 }
-            )
-        except BaseException as e:
-            return None
+            }
+        )
 
-        if not result:
-            return None
+    except BaseException as e:
+        print "[ DEBUG ] Printing exception"
+        print e
+        return None
 
-        group_ids.append(result[0]["groupid"])
+    if not result:
+        return None
 
-    return group_ids
+    return result[0]["groupid"]
 
 
-def get_host_ids(zbx, host_names):
-    host_ids = []
-    for host in host_names.strip().split(","):
-        try:
+def get_host_id(zbx, host_names):
+    try:
+
+        if '\"' in host_names:
+            host_name = host_names.replace("\"","")
+
             result = zbx.host.get(
                 {
                     "output": "extend",
                     "filter":
                     {
-                        "name": host
+                        "name": host_name
                     }
                 }
             )
-        except BaseException as e:
-            print e
-            return None
 
-        if not result:
-            return None
+    except BaseException as e:
+        print "[ DEBUG ] Printing exception"
+        print e
+        return None
 
-        host_ids.append(result[0]["hostid"])
+    if not result:
+        return None
 
-    return host_ids
+    return result[0]["hostid"]
 
 def main():
 
     if not HAS_ZABBIX_API:
         print("Missing requried zabbix-api module ")
 
-    host_names          = args.target
-    host_groups         = args.target
+    # host_names          = args.target
+    # host_groups         = args.target
+    target              = args.target
     state               = args.action
     login_user          = args.user
     login_password      = args.password
@@ -162,24 +168,6 @@ def main():
     server_url          = args.server
     collect_data        = 1                         # Need to variableize this :)
     timeout             = 5
-
-
-     ## Debugging info
-    print("Helping out *%s* to be quiet as ninja when working :) " % requestor)
-    print("host_names          = %s" % host_names)
-    print("host_groups         = %s" % host_groups)
-    print("state               = %s" % state)
-    # print("login_user          = %s" % http_login_user)
-    # print("login_password      = %s" % args.password)
-    # print("http_login_user     = %s" % http_login_user)
-    # print("http_login_password = %s" % args.password)
-    print("minutes             = %s" % minutes)
-    print("name/id             = %s" % name)
-    print("desc                = %s" % desc)
-    print("server_url          = %s" % server_url)
-    print("collect_data        = %s" % collect_data)
-    print("timeout             = %s" % timeout)
-    print("requestor           = %s" % requestor)
 
 
     # Havent yet created param for this
@@ -202,23 +190,69 @@ def main():
             start_time  = time.mktime(now.timetuple())
             period      = 60 * int(args.length)  # N * 60 seconds
 
+            # Defined our array for group IDs
+            group_ids     = []
+            host_ids      = []
 
-            if host_groups:
-                group_ids = get_group_ids(zbx, host_groups)
-                if not group_ids:
-                    print("Groups: 0")
+            # Query for groups
+            if ',' in target:
+                for group in target.strip().split(","):
+                    result = get_group_id(zbx, group)
+                    if result:
+                        group_ids.append(result)
             else:
-                group_ids = []
+                result = get_group_id(zbx, target)
+                if result:
+                    group_ids.append(result)
 
-            if host_names:
-                host_ids = get_host_ids(zbx, host_names)
-                if not host_ids:
-                    print("Hosts: 0")
+            # Query for hosts
+            if ',' in target:
+                for host in target.strip().split(","):
+                    result = get_host_id(zbx, host)
+                    if result:
+                        host_ids.append(result)
             else:
-                host_ids = []
+                result = get_host_id(zbx, target)
+                if result:
+                    host_ids.append(result)
 
+             ## info
+            print("Helping out *@%s* to be quiet as ninja when working :) " % requestor)
+            # print("host_names          = %s" % host_names)
+            # print("host_groups         = %s" % host_groups)
+            print("state               = %s" % state)
+            # print("login_user          = %s" % http_login_user)
+            # print("login_password      = %s" % args.password)
+            # print("http_login_user     = %s" % http_login_user)
+            # print("http_login_password = %s" % args.password)
+            print("minutes             = %s" % minutes)
+            print("name/id             = %s" % name)
+            print("desc                = %s" % desc)
+            # print("server_url          = %s" % server_url)
+            print("collect_data        = %s" % collect_data)
+            print("timeout             = %s" % timeout)
+            print("requestor           = %s" % requestor)
+            print("Found %s groups(s) / %s host(s) "% (len(group_ids),len(host_ids)) )
+
+
+            # if host_groups:
+            #     group_ids = get_group_ids(zbx, host_groups)
+            #     if not group_ids:
+            #         print("Groups: 0")
+            # else:
+            #     group_ids = []
+            #
+            # if host_names:
+            #     host_ids = get_host_ids(zbx, host_names)
+            #     if not host_ids:
+            #         print("Hosts: 0")
+            # else:
+            #     host_ids = []
+            #
+            #
+            #
             maintenance = get_maintenance_id_by_id(zbx, name)
-
+            #
             if not maintenance:
                 if not host_ids and not group_ids:
                     print("At least one host/host group must be defined/found to create maintenance.")
