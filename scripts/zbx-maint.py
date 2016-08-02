@@ -109,7 +109,6 @@ def get_group_id(zbx, host_group):
         )
 
     except BaseException as e:
-        print "[ DEBUG ] Printing exception"
         print e
         return None
 
@@ -123,20 +122,19 @@ def get_host_id(zbx, host_names):
     try:
 
         if '\"' in host_names:
-            host_name = host_names.replace("\"","")
+            host_names = host_names.replace("\"","")
 
-            result = zbx.host.get(
+        result = zbx.host.get(
+            {
+                "output": "extend",
+                "filter":
                 {
-                    "output": "extend",
-                    "filter":
-                    {
-                        "name": host_name
-                    }
+                    "name": host_names
                 }
-            )
+            }
+        )
 
     except BaseException as e:
-        print "[ DEBUG ] Printing exception"
         print e
         return None
 
@@ -194,6 +192,8 @@ def main():
             group_ids     = []
             host_ids      = []
 
+            result = None
+
             # Query for groups
             if ',' in target:
                 for group in target.strip().split(","):
@@ -220,6 +220,7 @@ def main():
             print("Helping out *@%s* to be quiet as ninja when working :) " % requestor)
             # print("host_names          = %s" % host_names)
             # print("host_groups         = %s" % host_groups)
+            print("query               = '%s'" % target)
             print("state               = %s" % state)
             # print("login_user          = %s" % http_login_user)
             # print("login_password      = %s" % args.password)
@@ -232,7 +233,7 @@ def main():
             print("collect_data        = %s" % collect_data)
             print("timeout             = %s" % timeout)
             print("requestor           = %s" % requestor)
-            print("Found %s groups(s) / %s host(s) "% (len(group_ids),len(host_ids)) )
+            print("Found %s group(s) / %s host(s) "% (len(group_ids),len(host_ids)) )
 
 
             # if host_groups:
