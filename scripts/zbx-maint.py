@@ -98,6 +98,9 @@ def get_group_id(zbx, host_group):
         if '\"' in host_group:
             host_group = host_group.replace("\"","")
 
+        # Issue:1 whitespace in groups/hosts
+        host_group = host_group.strip(" \n\t\r")
+
         result = zbx.hostgroup.get(
             {
                 "output": "extend",
@@ -123,6 +126,9 @@ def get_host_id(zbx, host_names):
 
         if '\"' in host_names:
             host_names = host_names.replace("\"","")
+
+        # Issue:1 whitespace in groups/hosts
+        host_names = host_names.strip(" \n\t\r")
 
         result = zbx.host.get(
             {
@@ -235,25 +241,8 @@ def main():
             print("requestor           = %s" % requestor)
             print("Found %s group(s) / %s host(s) "% (len(group_ids),len(host_ids)) )
 
-
-            # if host_groups:
-            #     group_ids = get_group_ids(zbx, host_groups)
-            #     if not group_ids:
-            #         print("Groups: 0")
-            # else:
-            #     group_ids = []
-            #
-            # if host_names:
-            #     host_ids = get_host_ids(zbx, host_names)
-            #     if not host_ids:
-            #         print("Hosts: 0")
-            # else:
-            #     host_ids = []
-            #
-            #
-            #
             maintenance = get_maintenance_id_by_id(zbx, name)
-            #
+
             if not maintenance:
                 if not host_ids and not group_ids:
                     print("At least one host/host group must be defined/found to create maintenance.")
