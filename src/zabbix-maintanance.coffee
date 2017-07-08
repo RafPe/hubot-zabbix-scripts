@@ -31,7 +31,7 @@ module.exports = (robot) ->
 
   robot.respond /zbx-maint\s(set)\s(["]?\w.*)\s(\d+)\s(["]?\w.*)/i, (msg) ->
 
-    zbxhostgroup  = msg.match[2]
+    zbxhostgroup  = msg.match[2].replace /https?:\/\//gi, ""
     zbxlength     = msg.match[3]
     zbxaction     = msg.match[1]
     zbxdesc       = "Created by #{msg.message.user.name} : " + msg.match[4]
@@ -63,4 +63,3 @@ module.exports = (robot) ->
       msg.send chunk.toString()
     proc.stdout.on 'end', () ->
       msg.send data.toString()
-
