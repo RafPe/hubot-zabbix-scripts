@@ -1,29 +1,37 @@
-# Description:
-#   Generates help commands for Hubot.
+# Description
+#   Hubot script allowing to create/delete zabbix maintanance
+#
+# Configuration:
+#   LIST_OF_ENV_VARS_TO_SET
 #
 # Commands:
 #   bender zbx-maint set <host_group>,<host> <minutes> <description>
-#   bender zbx-maint del <maintenance_uuid>
-#
-# URLS:
-#   /hubot/help
+#   bender zbx-maint del <maintenance_uuid>#
 #
 # Configuration:
-#   HUBOT_HELP_REPLY_IN_PRIVATE
+#   HUBOT_ZBX_USER
+#   HUBOT_ZBX_PW
+#   HUBOT_ZBX_URL
 #
 # Notes:
-#   These commands are grabbed from comment blocks at the top of each file.
+#   <optional notes required for the script>
+#
+# Author:
+#   RafPe <rafal@pieniazek.nl>
 
 zbxUsername   = process.env.HUBOT_ZBX_USER
 zbxPassword   = process.env.HUBOT_ZBX_PW
 zbxUrl        = process.env.HUBOT_ZBX_URL
-zbxscriptpath = process.env.HUBOT_ZBX_PYMAINT
+
 
 
 module.exports = (robot) ->
+
+  zbxscriptpath = __dirname
+
   robot.respond /zbx-maint\s(set)\s(["]?\w.*)\s(\d+)\s(["]?\w.*)/i, (msg) ->
 
-    zbxhostgroup  = msg.match[2]
+    zbxhostgroup  = msg.match[2].replace /https?:\/\//gi, ""
     zbxlength     = msg.match[3]
     zbxaction     = msg.match[1]
     zbxdesc       = "Created by #{msg.message.user.name} : " + msg.match[4]
