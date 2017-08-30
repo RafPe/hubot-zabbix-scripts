@@ -22,12 +22,11 @@
 zbxUsername   = process.env.HUBOT_ZBX_USER
 zbxPassword   = process.env.HUBOT_ZBX_PW
 zbxUrl        = process.env.HUBOT_ZBX_URL
+zbxscriptpath = process.env.HUBOT_ZBX_PYMAINT
 
 
 
 module.exports = (robot) ->
-
-  zbxscriptpath = __dirname
 
   robot.respond /zbx-maint\s(set)\s(["]?\w.*)\s(\d+)\s(["]?\w.*)/i, (msg) ->
 
